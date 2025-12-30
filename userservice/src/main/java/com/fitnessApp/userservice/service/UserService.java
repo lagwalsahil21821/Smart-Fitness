@@ -9,9 +9,11 @@ import com.fitnessApp.userservice.model.User;
 import com.fitnessApp.userservice.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class UserService {
     private final UserRepository repository;
 
@@ -28,5 +30,10 @@ public class UserService {
         User user = UserMapper.mapToUser(request);
         User savedUser = repository.save(user);
         return UserMapper.mapToUserDto(savedUser);
+    }
+
+    public boolean existByUserId(String userId) {
+        log.info("Calling User Validation API for UserId: {}", userId);
+        return repository.existsById(userId);
     }
 }

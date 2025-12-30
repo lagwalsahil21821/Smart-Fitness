@@ -15,8 +15,15 @@ import com.fitness.activityservice.repository.ActivityRepository;
 @AllArgsConstructor
 public class ActivityService {
     private final ActivityRepository repository;
+    private final UserValidationService userValidationService;
 
     public ActivityDto trackActivity(ActivityRequestDto request) {
+        boolean isValidUser = userValidationService.validateUser(request.getUserId());
+
+        if(!isValidUser) {
+            throw new RuntimeException("Invalid User ID: " + request.getUserId());
+        }
+
         Activity activity = ActivityMapper.mapToActivity(request);
         Activity savedActivity = repository.save(activity);
         return ActivityMapper.mapToActivityDto(savedActivity);
