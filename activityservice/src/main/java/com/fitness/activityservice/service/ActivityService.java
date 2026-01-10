@@ -1,8 +1,14 @@
 package com.fitness.activityservice.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fitness.activityservice.dto.ActivityDto;
@@ -12,10 +18,18 @@ import com.fitness.activityservice.model.Activity;
 import com.fitness.activityservice.repository.ActivityRepository;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 public class ActivityService {
     private final ActivityRepository repository;
     private final UserValidationService userValidationService;
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${rabbitmq.exchange.name}")
+    private String exchange;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
 
     public ActivityDto trackActivity(ActivityRequestDto request) {
         boolean isValidUser = userValidationService.validateUser(request.getUserId());
@@ -26,6 +40,14 @@ public class ActivityService {
 
         Activity activity = ActivityMapper.mapToActivity(request);
         Activity savedActivity = repository.save(activity);
+
+        // Publish the activity to RabbitMQ for AI processing
+        try {
+            rabbitTemplate.convertAndSend(exchange, routingKey, savedActivity);
+        } catch (Exception e) {
+            log.error("Failed to publish activity to RabbitMQ with error: ", e);
+        }
+
         return ActivityMapper.mapToActivityDto(savedActivity);
     }
 
