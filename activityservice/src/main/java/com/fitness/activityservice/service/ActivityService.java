@@ -21,15 +21,16 @@ import com.fitness.activityservice.repository.ActivityRepository;
 @RequiredArgsConstructor
 @Slf4j
 public class ActivityService {
-    private final ActivityRepository repository;
-    private final UserValidationService userValidationService;
-    private final RabbitTemplate rabbitTemplate;
-
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
 
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
+
+    private final ActivityRepository repository;
+    private final UserValidationService userValidationService;
+    private final RabbitTemplate rabbitTemplate;
+
 
     public ActivityDto trackActivity(ActivityRequestDto request) {
         boolean isValidUser = userValidationService.validateUser(request.getUserId());
