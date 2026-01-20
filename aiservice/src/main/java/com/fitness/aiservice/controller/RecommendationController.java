@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("api/recommendations")
+@RequestMapping("/api/recommendations")
 public class RecommendationController {
     private final RecommendationService recommendationService;
 

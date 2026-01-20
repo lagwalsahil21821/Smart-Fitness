@@ -16,7 +16,7 @@ import com.fitness.activityservice.dto.ActivityRequestDto;
 import com.fitness.activityservice.service.ActivityService;
 
 @RestController
-@RequestMapping("api/activities")
+@RequestMapping("/api/activities")
 @AllArgsConstructor
 public class ActivityController {
     private final ActivityService activityService;
